@@ -10,6 +10,7 @@ Starter themes aligned with the [learning resources](learning-resources.md) cata
 | Local inference | Python + Ollama/vLLM | LLM fundamentals section |
 | HF workflows | Python + `transformers` / Agents course | Hugging Face section |
 | HF from Go | Go + Inference API (`net/http`) | [go/hf-inference-hello](../apps/go/hf-inference-hello/) |
+| HF from Node | Node 20+ `fetch` + `http` | [node/hf-inference-hello](../apps/node/hf-inference-hello/) |
 
 ## Example project names
 

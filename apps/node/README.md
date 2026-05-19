@@ -2,6 +2,12 @@
 
 Use when you want plain JavaScript without TypeScript, or quick scripts against provider SDKs.
 
+## Projects
+
+| Project | Description |
+|---------|-------------|
+| [hf-inference-hello](hf-inference-hello/) | HF Inference sentiment — CLI (`npm start`) + server (`npm run serve`) |
+
 ## New project
 
 ```bash
