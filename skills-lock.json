@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "skills": {
+    "design-agent": {
+      "source": "crewaiinc/skills",
+      "sourceType": "github",
+      "skillPath": "skills/design-agent/SKILL.md",
+      "computedHash": "94227dac423abf20645447e3f001ec01bc6efed2a479f9dac50aca2759f61295"
+    },
+    "fastapi": {
+      "source": "fastapi/fastapi",
+      "sourceType": "github",
+      "skillPath": "fastapi/.agents/skills/fastapi/SKILL.md",
+      "computedHash": "ee23d5285caf055cf164ff45dd34888d381143564666baacab8aa786f22e413a"
+    },
+    "getting-started": {
+      "source": "crewaiinc/skills",
+      "sourceType": "github",
+      "skillPath": "skills/getting-started/SKILL.md",
+      "computedHash": "3128b91809cca7605d69c0a352137e253f95caf5b175adf4c8cdb1fc5e21e8a2"
+    },
+    "hf-cli": {
+      "source": "huggingface/skills",
+      "sourceType": "github",
+      "skillPath": "skills/hf-cli/SKILL.md",
+      "computedHash": "6e76596b733b79cc4b5dd835bbff6b479f38e7435ef9c534dc80502379e0c23a"
+    },
+    "huggingface-datasets": {
+      "source": "huggingface/skills",
+      "sourceType": "github",
+      "skillPath": "skills/huggingface-datasets/SKILL.md",
+      "computedHash": "d28d1ee4a61133ab6c1e12c74094681c2026c7e656784bd09831f91618fd0120"
+    },
+    "langchain-fundamentals": {
+      "source": "langchain-ai/langchain-skills",
+      "sourceType": "github",
+      "skillPath": "config/skills/langchain-fundamentals/SKILL.md",
+      "computedHash": "ede1b3210a135e2c7eb5ddb51e0aaf3b78fde07cfd9fbe6efaeb4d6c5db60bd2"
+    },
+    "langchain-rag": {
+      "source": "langchain-ai/langchain-skills",
+      "sourceType": "github",
+      "skillPath": "config/skills/langchain-rag/SKILL.md",
+      "computedHash": "545c661f6ed9b54cfe078a438052b2742d6122fc022f69db67d1a01aca4c726c"
+    },
+    "langgraph-fundamentals": {
+      "source": "langchain-ai/langchain-skills",
+      "sourceType": "github",
+      "skillPath": "config/skills/langgraph-fundamentals/SKILL.md",
+      "computedHash": "d754005c69632037ca79c4daa8177b03e5a0f17f40cde3b0f532b33a8df88ded"
+    },
+    "openai-knowledge": {
+      "source": "openai/openai-agents-python",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/openai-knowledge/SKILL.md",
+      "computedHash": "73d1dcef59cab02b678375766e30df5169eb307cc5f84aa86c72b1236519240c"
+    }
+  }
+}
