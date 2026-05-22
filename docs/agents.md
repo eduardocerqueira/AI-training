@@ -6,12 +6,12 @@ Automation that runs **at least once per week** (staggered cron) or on demand. S
 
 | Agent | Workflow | Schedule (UTC) | Secret(s) | Opens |
 |-------|----------|----------------|-----------|--------|
-| [Docs bot](../scripts/docs-bot/README.md) | [`docs-bot.yml`](../.github/workflows/docs-bot.yml) | Mon 08:00 | `OPENAI_API_KEY` | PR |
+| [Docs bot](../scripts/docs-bot/README.md) | [`docs-bot.yml`](../.github/workflows/docs-bot.yml) | Mon 08:00 | `OPENAI_API_KEY`, `BOT_GH_TOKEN` (recommended) | PR |
 | [CVE scan](../scripts/cve-scan/README.md) | [`cve-scan.yml`](../.github/workflows/cve-scan.yml) | Wed 08:00 | — | Issue (if HIGH/CRITICAL) |
-| [Issue worker](../scripts/issue-bot/README.md) | [`issue-bot.yml`](../.github/workflows/issue-bot.yml) | Fri 08:00 + label `agent` | `OPENAI_API_KEY` | Plan + PR |
+| [Issue worker](../scripts/issue-bot/README.md) | [`issue-bot.yml`](../.github/workflows/issue-bot.yml) | Fri 08:00 + label `agent` | `OPENAI_API_KEY`, `BOT_GH_TOKEN` (recommended) | Plan + PR |
 | [PR steward](../scripts/pr-bot/README.md) | [`pr-bot.yml`](../.github/workflows/pr-bot.yml) | Sat 08:00 + after PR Check | `OPENAI_API_KEY` (optional) | Comment |
-| [Test bot](../scripts/test-bot/README.md) | [`test-bot.yml`](../.github/workflows/test-bot.yml) | Sun 07:00 | `OPENAI_API_KEY` | PR |
-| [Experiment agent](../scripts/experiment-agent/README.md) | [`experiment-agent.yml`](../.github/workflows/experiment-agent.yml) | Odd days 08:00 | `OPENAI_API_KEY` | Issue + PR |
+| [Test bot](../scripts/test-bot/README.md) | [`test-bot.yml`](../.github/workflows/test-bot.yml) | Sun 07:00 | `OPENAI_API_KEY`, `BOT_GH_TOKEN` (recommended) | PR |
+| [Experiment agent](../scripts/experiment-agent/README.md) | [`experiment-agent.yml`](../.github/workflows/experiment-agent.yml) | Odd days 08:00 | `OPENAI_API_KEY`, `BOT_GH_TOKEN` (recommended) | Issue + PR |
 
 Manual run: **Actions** → pick workflow → **Run workflow**.
 
@@ -42,7 +42,7 @@ flowchart TD
 - **Purpose:** Sync the apps catalog table in [`apps/README.md`](../apps/README.md).
 - **Script:** [`scripts/docs-bot/`](../scripts/docs-bot/README.md) · **Workflow:** [`.github/workflows/docs-bot.yml`](../.github/workflows/docs-bot.yml)
 - **Schedule:** Monday 08:00 UTC (`0 8 * * 1`) · **Trigger:** `workflow_dispatch`
-- **Secrets:** `OPENAI_API_KEY` (optional polish) · **Opens:** PR on `docs-bot/<timestamp>`
+- **Secrets:** `OPENAI_API_KEY` (optional polish); **`BOT_GH_TOKEN`** for push/PR (triggers PR Check) · **Opens:** PR on `docs-bot/<timestamp>`
 
 ### CVE scan
 
@@ -56,7 +56,7 @@ flowchart TD
 - **Purpose:** Triage issues labeled [`agent`](https://github.com/eduardocerqueira/AI-sandbox/issues?q=is%3Aissue+label%3Aagent) — plan comment, then LLM implementation on `issue-bot/<n>-<slug>` and a PR.
 - **Script:** [`scripts/issue-bot/`](../scripts/issue-bot/README.md) · **Workflow:** [`.github/workflows/issue-bot.yml`](../.github/workflows/issue-bot.yml)
 - **Schedule:** Friday 08:00 UTC (`0 8 * * 5`) · **Trigger:** `issues` labeled `agent`, `workflow_dispatch` (optional `plan_only`)
-- **Secrets:** `OPENAI_API_KEY`; optional `ISSUE_BOT_GH_TOKEN` for `gh pr create` · **Opens:** issue comments + PR (`Closes #n` on merge)
+- **Secrets:** `OPENAI_API_KEY`; **`BOT_GH_TOKEN`** for push/PR (see below) · **Opens:** issue comments + PR (`Closes #n` on merge)
 
 ### PR steward
 
@@ -70,14 +70,14 @@ flowchart TD
 - **Purpose:** Find source files without tests in CI-covered apps, generate tests via LLM, verify with app test suites, open a PR.
 - **Script:** [`scripts/test-bot/`](../scripts/test-bot/README.md) · **Workflow:** [`.github/workflows/test-bot.yml`](../.github/workflows/test-bot.yml)
 - **Schedule:** Sunday 07:00 UTC (`0 7 * * 0`) · **Trigger:** `workflow_dispatch`
-- **Secrets:** `OPENAI_API_KEY`; optional `TEST_BOT_GH_TOKEN` for `gh pr create` · **Opens:** PR on `test-bot/<timestamp>`
+- **Secrets:** `OPENAI_API_KEY`; **`BOT_GH_TOKEN`** for push/PR · **Opens:** PR on `test-bot/<timestamp>`
 
 ### Experiment agent
 
 - **Purpose:** Pick a learning topic from [`docs/`](.), open a proposal issue, add research or scaffold a Python app, open a PR.
 - **Script:** [`scripts/experiment-agent/`](../scripts/experiment-agent/README.md) · **Workflow:** [`.github/workflows/experiment-agent.yml`](../.github/workflows/experiment-agent.yml)
 - **Schedule:** Odd calendar days 08:00 UTC (`0 8 1-31/2 * *`) · **Trigger:** `workflow_dispatch`
-- **Secrets:** `OPENAI_API_KEY` · **Opens:** issue + PR; issue closed on merge via [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml)
+- **Secrets:** `OPENAI_API_KEY`; **`BOT_GH_TOKEN`** for push/PR · **Opens:** issue + PR; issue closed on merge via [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml)
 
 ## Issue → PR workflow (agent issues)
 
@@ -102,8 +102,24 @@ Use workflow input **`plan_only`** to get a plan without opening a PR. **Experim
 
 1. Enable Actions on the repo.
 2. Add repository secret **`OPENAI_API_KEY`** (docs, test, issue bots; optional for PR steward).
-3. For issue bot: create label **`agent`** and open issues you want automated (keep scope small).
-4. Optional: branch protection requiring **PR Check** before merge.
+3. Add **`BOT_GH_TOKEN`** — one fine-grained PAT for all bots that push branches and open PRs (see [Bot PAT](#bot-pat-one-secret-for-all-pr-bots)).
+4. For issue bot: create label **`agent`** and open issues you want automated (keep scope small).
+5. Optional: branch protection requiring **PR Check** before merge.
+
+## Bot PAT (one secret for all PR bots)
+
+Bots that **push a branch** and **open a PR** must not use the default `GITHUB_TOKEN` for those git/`gh` calls. GitHub does not run downstream workflows (including **PR Check**) on events triggered by `GITHUB_TOKEN`.
+
+| Secret | Purpose |
+|--------|---------|
+| **`BOT_GH_TOKEN`** (recommended) | Single fine-grained PAT used by issue-bot, test-bot, docs-bot, and experiment-agent |
+| `ISSUE_BOT_GH_TOKEN`, `TEST_BOT_GH_TOKEN` | Legacy names; still accepted if `BOT_GH_TOKEN` is unset |
+
+**Create the PAT:** GitHub → Settings → Developer settings → Fine-grained token → repository **AI-sandbox** only → **Contents** and **Pull requests** read/write.
+
+**Add the secret:** Repo → Settings → Secrets and variables → Actions → **`BOT_GH_TOKEN`**. If you already added `ISSUE_BOT_GH_TOKEN`, you can keep it (workflows fall back to it) or copy the same value into `BOT_GH_TOKEN` and delete the old name.
+
+**Repo settings:** Actions → General → workflow **read/write** permissions; enable **Allow GitHub Actions to create and approve pull requests** when useful.
 
 ## Workflow approval (Copilot / bot PRs)
 
@@ -124,7 +140,7 @@ Fork PRs: in **Settings → Actions → General**, you can set fork workflows to
 
 | Workflow | Runs when a PR opens? |
 |----------|------------------------|
-| **PR Check** | Yes — every `pull_request` |
+| **PR Check** | Yes — on `pull_request` (including bot PRs when push uses **`BOT_GH_TOKEN`**, not `GITHUB_TOKEN`) |
 | **PR steward** | Yes — after **PR Check** completes (`workflow_run`; no approval gate) |
 | **Auto-approve** | Yes — unblocks other workflows awaiting maintainer on PR open/update |
 | test-bot, docs-bot, CVE scan, issue-bot, experiment-agent | No — cron or manual only |

@@ -36,7 +36,7 @@ agent-fix: short description of the change
 
 [`.github/workflows/issue-bot.yml`](../../.github/workflows/issue-bot.yml) — Fridays 08:00 UTC, `issues` labeled `agent`, manual dispatch.
 
-Requires **`OPENAI_API_KEY`**. Optional **`ISSUE_BOT_GH_TOKEN`** if `GITHUB_TOKEN` cannot open PRs.
+Requires **`OPENAI_API_KEY`**. For push + PR (so **PR Check** runs), set repo secret **`BOT_GH_TOKEN`** (one PAT for all bots). Legacy **`ISSUE_BOT_GH_TOKEN`** still works if unset.
 
 The workflow checks out the **default branch** before running (same pattern as PR steward).
 

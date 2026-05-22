@@ -29,6 +29,8 @@ jobs:
     name: Generate tests and open PR
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      BOT_GH_TOKEN: ${{ secrets.BOT_GH_TOKEN || secrets.ISSUE_BOT_GH_TOKEN || secrets.TEST_BOT_GH_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -59,7 +61,7 @@ jobs:
           TEST_BOT_MAX_TARGETS: ${{ inputs.max_targets || '2' }}
           TEST_BOT_DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
           TEST_BOT_BASE_BRANCH: ${{ github.event.repository.default_branch }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ env.BOT_GH_TOKEN }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "::error::OPENAI_API_KEY repository secret is required."
@@ -70,7 +72,7 @@ jobs:
       - name: Create pull request
         if: ${{ !inputs.dry_run && steps.test-bot.outputs.branch != '' }}
         env:
-          GH_TOKEN: ${{ secrets.TEST_BOT_GH_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ env.BOT_GH_TOKEN }}
           PR_BODY: ${{ steps.test-bot.outputs.pr_body }}
         run: |
           set -euo pipefail
@@ -83,7 +85,7 @@ jobs:
             --base "${{ github.event.repository.default_branch }}"; then
             echo "Opened pull request for branch ${{ steps.test-bot.outputs.branch }}"
           else
-            echo "::error::Could not create pull request. Enable Settings → Actions → General → \"Allow GitHub Actions to create and approve pull requests\", or add repository secret TEST_BOT_GH_TOKEN (fine-grained PAT with Contents and Pull requests write)."
+            echo "::error::Could not create pull request. Enable Actions PR creation or set BOT_GH_TOKEN (fine-grained PAT: Contents + Pull requests write)."
             echo "Branch was pushed: ${{ steps.test-bot.outputs.branch }}"
             exit 1
           fi

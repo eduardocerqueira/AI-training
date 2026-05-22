@@ -47,7 +47,7 @@ Inputs: `max_targets` (default 2), `dry_run` (default false).
 
 **Settings → Actions → General → Workflow permissions** — use **Read and write**, and enable **Allow GitHub Actions to create and approve pull requests**.
 
-If your org blocks that, add optional secret **`TEST_BOT_GH_TOKEN`** (fine-grained PAT with **Contents** and **Pull requests** write on this repo). The workflow uses it for `gh pr create` when set.
+For push + PR (so **PR Check** runs), set **`BOT_GH_TOKEN`** (fine-grained PAT: **Contents** + **Pull requests** write on this repo). One PAT is shared with issue-bot, docs-bot, and experiment-agent. Legacy **`TEST_BOT_GH_TOKEN`** still works if `BOT_GH_TOKEN` is unset.
 
 The test bot pushes its branch in the main step; a follow-up workflow step opens the PR so failures surface with a clear error instead of inside the Python traceback.
 
