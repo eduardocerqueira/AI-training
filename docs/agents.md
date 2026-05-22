@@ -11,6 +11,7 @@ Automation that runs **at least once per week** (staggered cron) or on demand. S
 | [Issue worker](../scripts/issue-bot/README.md) | [`issue-bot.yml`](../.github/workflows/issue-bot.yml) | Fri 08:00 + label `agent` | `OPENAI_API_KEY` | Comment (plan) |
 | [PR steward](../scripts/pr-bot/README.md) | [`pr-bot.yml`](../.github/workflows/pr-bot.yml) | Sat 08:00 + after PR Check | `OPENAI_API_KEY` (optional) | Comment |
 | [Test bot](../scripts/test-bot/README.md) | [`test-bot.yml`](../.github/workflows/test-bot.yml) | Sun 07:00 | `OPENAI_API_KEY` | PR |
+| [Experiment agent](../scripts/experiment-agent/README.md) | [`experiment-agent.yml`](../.github/workflows/experiment-agent.yml) | Odd days 08:00 | `OPENAI_API_KEY` | Issue + PR |
 
 Manual run: **Actions** → pick workflow → **Run workflow**.
 
@@ -35,7 +36,7 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 - **Purpose:** Triage open issues labeled [`agent`](https://github.com/eduardocerqueira/AI-sandbox/issues?q=is%3Aissue+label%3Aagent) — posts a plan comment and adds `agent-in-progress`.
 - **Script:** [`scripts/issue-bot/`](../scripts/issue-bot/README.md) · **Workflow:** [`.github/workflows/issue-bot.yml`](../.github/workflows/issue-bot.yml)
 - **Schedule:** Friday 08:00 UTC (`0 8 * * 5`) · **Trigger:** `issues` labeled `agent`, `workflow_dispatch`
-- **Secrets:** `OPENAI_API_KEY` (plan text; manual checklist if unset) · **Opens:** issue comment (v1 does not open implementation PRs; `agent-fix:` titles are acknowledged only)
+- **Secrets:** `OPENAI_API_KEY` (plan text; manual checklist if unset) · **Opens:** issue comment (implementation PR is manual in v1; see [PR #6](https://github.com/eduardocerqueira/AI-sandbox/pull/6) for v2)
 - **Next step after plan:** implement manually or open a PR linked to the issue (e.g. `Closes #4`).
 
 ### PR steward
@@ -52,7 +53,14 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 - **Schedule:** Sunday 07:00 UTC (`0 7 * * 0`) · **Trigger:** `workflow_dispatch`
 - **Secrets:** `OPENAI_API_KEY`; optional `TEST_BOT_GH_TOKEN` for `gh pr create` · **Opens:** PR on `test-bot/<timestamp>`
 
-## Issue → PR workflow (today)
+### Experiment agent
+
+- **Purpose:** Pick a learning topic from [`docs/`](.), open a proposal issue, add research or scaffold a Python app, open a PR.
+- **Script:** [`scripts/experiment-agent/`](../scripts/experiment-agent/README.md) · **Workflow:** [`.github/workflows/experiment-agent.yml`](../.github/workflows/experiment-agent.yml)
+- **Schedule:** Odd calendar days 08:00 UTC (`0 8 1-31/2 * *`) · **Trigger:** `workflow_dispatch`
+- **Secrets:** `OPENAI_API_KEY` · **Opens:** issue + PR; issue closed on merge via [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml)
+
+## Issue → PR workflow (agent issues)
 
 | Step | Who |
 |------|-----|
@@ -62,7 +70,7 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 | 4. PR Check + steward comment | **PR Check**, **PR steward** |
 | 5. Merge | You |
 
-No bot chains issue-bot → implementation PR yet. **Test bot** and **docs-bot** open their own PRs on a schedule; they do not consume issue plans.
+**Experiment agent** and **test-bot** open their own PRs on a schedule without an `agent` issue.
 
 ## Safety defaults
 
@@ -100,9 +108,17 @@ Fork PRs: in **Settings → Actions → General**, you can set fork workflows to
 | **PR Check** | Yes — every `pull_request` |
 | **PR steward** | Yes — after **PR Check** completes (`workflow_run`; no approval gate) |
 | **Auto-approve** | Yes — unblocks other workflows awaiting maintainer on PR open/update |
-| test-bot, docs-bot, CVE scan, issue-bot | No — cron or manual only |
+| test-bot, docs-bot, CVE scan, issue-bot, experiment-agent | No — cron or manual only |
 
 Bots do not chain automatically (test-bot does not wake docs-bot). Use schedules or run workflows manually.
+
+## Experiment agent lifecycle
+
+1. **Proposal** — opens an issue (`experiment-agent` + `agent-in-progress`) describing the topic from [docs/](.).
+2. **Work** — adds `docs/experiments/*.md` or scaffolds `apps/python/<slug>/`, runs `pytest` for code.
+3. **PR** — branch `experiment-agent/…`, body includes `Closes #<issue>`.
+4. **Review** — PR Check + PR steward (same as other PRs).
+5. **Close** — [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml) closes the issue when the PR merges.
 
 ## Limits (honest)
 
@@ -110,7 +126,7 @@ Bots do not chain automatically (test-bot does not wake docs-bot). Use schedules
 |------|------------|--------|
 | Update all docs from code | Partial | Docs bot syncs app catalog tables; deep rewrites need review |
 | CVE → issue | Yes | Trivy filesystem scan; dev dependency noise possible |
-| Fix issues end-to-end | Plan only (v1) | Issue bot comments a plan; implementation PR is manual |
+| Fix issues end-to-end | Plan only (v1) | Issue bot comments a plan; implementation PR is manual until v2 merges |
 | Review + merge PR | Review only | Comments and checklist; **you** merge |
 
 Hugging Face Jobs can run batch Python but do not replace GitHub for issues/PRs — keep orchestration in Actions.

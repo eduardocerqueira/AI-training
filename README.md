@@ -55,7 +55,7 @@ cp -r apps/python/_template apps/python/my-experiment
 
 Details: [docs/getting-started.md](docs/getting-started.md) · [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**CI:** PR checks and nightly tests in GitHub Actions. **Scheduled agents** (test, docs, CVE, issues, PR review): [docs/agents.md](docs/agents.md) — most need `OPENAI_API_KEY`.
+**CI:** PR checks and nightly tests in GitHub Actions. **Scheduled agents** (test, docs, CVE, issues, PR review, experiments): [docs/agents.md](docs/agents.md) — most need `OPENAI_API_KEY`.
 
 ## Documentation
 
@@ -65,7 +65,7 @@ Details: [docs/getting-started.md](docs/getting-started.md) · [CONTRIBUTING.md]
 | **Agent skills** | [docs/skills.md](docs/skills.md) |
 | **Experiment ideas** | [docs/experiment-ideas.md](docs/experiment-ideas.md) |
 | **Courses & certs** | [docs/learning-resources.md](docs/learning-resources.md) |
-| **Scheduled agents** | [docs/agents.md](docs/agents.md) — test-bot, docs-bot, CVE scan, issue-bot, PR steward |
+| **Scheduled agents** | [docs/agents.md](docs/agents.md) — test-bot, docs-bot, CVE scan, issue-bot, PR steward, experiment-agent |
 | **All docs** | [docs/README.md](docs/README.md) |
 
 ## Why this exists
