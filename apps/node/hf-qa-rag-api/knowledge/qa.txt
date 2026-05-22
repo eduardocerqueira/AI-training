@@ -1,0 +1,65 @@
+Q: What is this project?
+A: A Node.js REST API plus a TypeScript React UI. Answers use a local Q&A file (knowledge/qa.txt) and Hugging Face chat inference. The UI uses assistant-ui and shadcn for a ChatGPT-style experience.
+
+Q: How does answering work (v1)?
+A: The full knowledge/qa.txt file is injected into the system prompt. There is no vector database or embeddings yet — the model reads the entire Q&A file each request.
+
+Q: What runtime versions are required?
+A: Node.js 20+ for the API (apps/node/hf-qa-rag-api) and Node 20+ for the UI (apps/typescript/hf-qa-rag-ui).
+
+Q: How do I set up the API?
+A: From apps/node/hf-qa-rag-api: npm install, copy .env.example to .env, set HF_TOKEN from https://huggingface.co/settings/tokens.
+
+Q: How do I run the API?
+A: From apps/node/hf-qa-rag-api: npm run dev (or npm start). Default URL http://127.0.0.1:8000.
+
+Q: How do I run the chat UI?
+A: Start the API first. From apps/typescript/hf-qa-rag-ui: npm install, cp .env.example .env, npm run dev. Open http://127.0.0.1:5173. Set VITE_API_URL if the API is not on port 8000.
+
+Q: What if port 8000 is already in use?
+A: Set PORT in apps/node/hf-qa-rag-api/.env (e.g. 8001) and match VITE_API_URL in the UI .env.
+
+Q: Where is the knowledge base stored?
+A: apps/node/hf-qa-rag-api/knowledge/qa.txt. Override with KNOWLEDGE_PATH in the API .env.
+
+Q: How do I update the knowledge base without restarting?
+A: Edit knowledge/qa.txt, then POST /knowledge/reload, or restart the API. GET /knowledge shows path, character count, and a preview.
+
+Q: What environment variables does the API support?
+A: HF_TOKEN (required for /chat), HF_MODEL (Hub model id), KNOWLEDGE_PATH (default knowledge/qa.txt), PORT (default 8000).
+
+Q: What environment variables does the UI support?
+A: VITE_API_URL (default http://127.0.0.1:8000) pointing at the Node API.
+
+Q: How do I choose a Hugging Face model?
+A: Set HF_MODEL to a Hub model id (e.g. Qwen/Qwen2.5-1.5B-Instruct). On huggingface.co, open the model page and check Inference Providers — enable at least one provider at https://huggingface.co/settings/inference-providers.
+
+Q: Why do I get a 502 from /chat?
+A: The model may not be hosted on any Inference Provider you have enabled. Pick a model that lists your providers or enable a matching provider in HF settings.
+
+Q: What API endpoints exist?
+A: GET /health, GET /knowledge, POST /knowledge/reload, POST /chat (body: message and optional history).
+
+Q: What is the /chat request format?
+A: JSON with "message" (required string) and optional "history": list of {"role": "user"|"assistant", "content": "..."}. Only the last 10 history turns are sent to the model.
+
+Q: What does /chat return?
+A: JSON with "answer" (string) and "sources" (list of paths, usually the knowledge file relative to the API root).
+
+Q: How do I test /chat from the terminal?
+A: curl -s http://127.0.0.1:8000/chat -H 'Content-Type: application/json' -d '{"message": "How do I run the API?"}'
+
+Q: How do I run API tests?
+A: From apps/node/hf-qa-rag-api: npm test.
+
+Q: What UI libraries does the frontend use?
+A: React, Vite, Tailwind CSS, shadcn/ui components, and assistant-ui (@assistant-ui/react) for chat state and primitives.
+
+Q: What happens if HF_TOKEN is missing?
+A: /chat returns 503 with a message to copy .env.example to .env and set HF_TOKEN.
+
+Q: What are the limitations of v1?
+A: Entire knowledge file in one prompt (size limited by model context), no chunking, no semantic search, no citation of specific Q&A pairs — only the file path in sources.
+
+Q: What are suggested next steps?
+A: Replace qa.txt with real domain Q&A, deploy the API, add chunking plus embeddings when the knowledge base outgrows the context window.

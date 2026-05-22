@@ -17,7 +17,7 @@ Treat `.agents/` like `node_modules/`: reproducible from the lockfile, not vendo
 Restore project skills from the lockfile:
 
 ```bash
-cd AI-training
+cd AI-sandbox
 npx skills experimental_install
 ```
 
@@ -84,7 +84,7 @@ For conventions specific to *this* monorepo (layout, naming, docs links), add ha
 
 ```
 .cursor/skills/
-└── ai-training-sandbox/
+└── ai-sandbox/
     └── SKILL.md
 ```
 

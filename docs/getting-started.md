@@ -16,9 +16,9 @@ API keys (OpenAI, Anthropic, Hugging Face, etc.) go in each app’s `.env` file 
 ## Clone the repo
 
 ```bash
-git clone git@github.com:eduardocerqueira/AI-training.git
-# or: git clone https://github.com/eduardocerqueira/AI-training.git
-cd AI-training
+git clone git@github.com:eduardocerqueira/AI-sandbox.git
+# or: git clone https://github.com/eduardocerqueira/AI-sandbox.git
+cd AI-sandbox
 ```
 
 ## Restore agent skills

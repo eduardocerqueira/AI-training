@@ -1,6 +1,6 @@
 # Free AI courses & certifications
 
-> Part of the [AI Training](../README.md) monorepo. Runnable experiments live under [`apps/`](../apps/).
+> Part of the [AI Sandbox](../README.md) monorepo. Runnable experiments live under [`apps/`](../apps/).
 
 > **Disclosure**  
 > This is a **personal bookmark** of AI training resources I find relevant to my career **at this time**. I share it publicly for convenience only.  

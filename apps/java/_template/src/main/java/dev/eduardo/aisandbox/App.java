@@ -1,4 +1,4 @@
-package dev.eduardo.aitraining;
+package dev.eduardo.aisandbox;
 
 public final class App {
   private App() {}

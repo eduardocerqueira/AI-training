@@ -78,7 +78,7 @@ def top_hub_model_for_task(task: str) -> str:
 @tool
 def learning_path_tip(topic: str) -> str:
     """
-    Suggest what to study in the AI-training monorepo for a given topic.
+    Suggest what to study in the AI-sandbox monorepo for a given topic.
 
     Args:
         topic: Keyword like agents, rag, mcp, langchain, huggingface, or cursor.

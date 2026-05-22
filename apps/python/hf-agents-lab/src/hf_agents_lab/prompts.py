@@ -7,7 +7,7 @@ EXAMPLE_PROMPTS: list[tuple[str, str]] = [
     ),
     (
         "study",
-        "I'm learning agents — what should I study next in the AI-training repo?",
+        "I'm learning agents — what should I study next in the AI-sandbox repo?",
     ),
     (
         "math",

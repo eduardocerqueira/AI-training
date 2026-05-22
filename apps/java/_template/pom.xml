@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>dev.eduardo.ai-training</groupId>
+  <groupId>dev.eduardo.aisandbox</groupId>
   <artifactId>my-project-name</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <name>my-project-name</name>
@@ -27,7 +27,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.5.0</version>
         <configuration>
-          <mainClass>dev.eduardo.aitraining.App</mainClass>
+          <mainClass>dev.eduardo.aisandbox.App</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -37,7 +37,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>dev.eduardo.aitraining.App</mainClass>
+              <mainClass>dev.eduardo.aisandbox.App</mainClass>
             </manifest>
           </archive>
         </configuration>

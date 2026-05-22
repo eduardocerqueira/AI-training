@@ -32,7 +32,7 @@ def top_hub_model_for_task(task: str) -> str:
 @tool
 def learning_path_tip(topic: str) -> str:
     """
-    Return a suggested learning path from the AI-training monorepo catalog for a topic.
+    Return a suggested learning path from the AI-sandbox monorepo catalog for a topic.
 
     Args:
         topic: Subject keyword such as agents, rag, mcp, langchain, huggingface, or cursor.
