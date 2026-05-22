@@ -81,5 +81,5 @@ flowchart TD
     D[Triggers] -->|Scheduled| A
     D -->|PR Triggered| B
     D -->|Auto-Approve| C
-    E[For full details, see] -->|[docs/agents.md]| F[Documentation]
+    E[For full details, see] --> F[Documentation]
 ```
