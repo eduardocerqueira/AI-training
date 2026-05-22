@@ -11,6 +11,7 @@ Automation that runs **at least once per week** (staggered cron) or on demand. S
 | [Issue worker](../scripts/issue-bot/README.md) | [`issue-bot.yml`](../.github/workflows/issue-bot.yml) | Fri 08:00 + label `agent` | `OPENAI_API_KEY` | Plan + PR |
 | [PR steward](../scripts/pr-bot/README.md) | [`pr-bot.yml`](../.github/workflows/pr-bot.yml) | Sat 08:00 + after PR Check | `OPENAI_API_KEY` (optional) | Comment |
 | [Test bot](../scripts/test-bot/README.md) | [`test-bot.yml`](../.github/workflows/test-bot.yml) | Sun 07:00 | `OPENAI_API_KEY` | PR |
+| [Experiment agent](../scripts/experiment-agent/README.md) | [`experiment-agent.yml`](../.github/workflows/experiment-agent.yml) | Odd days 08:00 | `OPENAI_API_KEY` | Issue + PR |
 
 Manual run: **Actions** → pick workflow → **Run workflow**.
 
@@ -51,7 +52,14 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 - **Schedule:** Sunday 07:00 UTC (`0 7 * * 0`) · **Trigger:** `workflow_dispatch`
 - **Secrets:** `OPENAI_API_KEY`; optional `TEST_BOT_GH_TOKEN` for `gh pr create` · **Opens:** PR on `test-bot/<timestamp>`
 
-## Issue → PR workflow
+### Experiment agent
+
+- **Purpose:** Pick a learning topic from [`docs/`](.), open a proposal issue, add research or scaffold a Python app, open a PR.
+- **Script:** [`scripts/experiment-agent/`](../scripts/experiment-agent/README.md) · **Workflow:** [`.github/workflows/experiment-agent.yml`](../.github/workflows/experiment-agent.yml)
+- **Schedule:** Odd calendar days 08:00 UTC (`0 8 1-31/2 * *`) · **Trigger:** `workflow_dispatch`
+- **Secrets:** `OPENAI_API_KEY` · **Opens:** issue + PR; issue closed on merge via [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml)
+
+## Issue → PR workflow (agent issues)
 
 | Step | Who |
 |------|-----|
@@ -61,7 +69,7 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 | 4. PR Check + steward comment | **PR Check**, **PR steward** |
 | 5. Merge | You (closes issue via `Closes #n`) |
 
-Use workflow input **`plan_only`** to get a plan without opening a PR.
+Use workflow input **`plan_only`** to get a plan without opening a PR. **Experiment agent** and **test-bot** open their own PRs on a schedule without an `agent` issue.
 
 ## Safety defaults
 
@@ -99,9 +107,17 @@ Fork PRs: in **Settings → Actions → General**, you can set fork workflows to
 | **PR Check** | Yes — every `pull_request` |
 | **PR steward** | Yes — after **PR Check** completes (`workflow_run`; no approval gate) |
 | **Auto-approve** | Yes — unblocks other workflows awaiting maintainer on PR open/update |
-| test-bot, docs-bot, CVE scan, issue-bot | No — cron or manual only |
+| test-bot, docs-bot, CVE scan, issue-bot, experiment-agent | No — cron or manual only |
 
 Bots do not chain automatically (test-bot does not wake docs-bot). Use schedules or run workflows manually.
+
+## Experiment agent lifecycle
+
+1. **Proposal** — opens an issue (`experiment-agent` + `agent-in-progress`) describing the topic from [docs/](.).
+2. **Work** — adds `docs/experiments/*.md` or scaffolds `apps/python/<slug>/`, runs `pytest` for code.
+3. **PR** — branch `experiment-agent/…`, body includes `Closes #<issue>`.
+4. **Review** — PR Check + PR steward (same as other PRs).
+5. **Close** — [`experiment-agent-close.yml`](../.github/workflows/experiment-agent-close.yml) closes the issue when the PR merges.
 
 ## Limits (honest)
 
