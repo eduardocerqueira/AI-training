@@ -18,3 +18,5 @@ Reviews **open pull requests** and posts a summary comment. Does **not** merge (
 [`.github/workflows/pr-bot.yml`](../../.github/workflows/pr-bot.yml) — Saturdays 08:00 UTC, and after [`pr-check.yml`](../../.github/workflows/pr-check.yml) completes on a PR.
 
 Pending runs from other workflows are auto-approved by [`approve-pending-actions.yml`](../../.github/workflows/approve-pending-actions.yml) when possible.
+
+The workflow checks out the **default branch** before `pip install -e ./scripts/pr-bot`, so steward logic always matches `main` even when reviewing an older PR branch.

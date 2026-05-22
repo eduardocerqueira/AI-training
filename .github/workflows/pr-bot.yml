@@ -28,7 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # Always run pr-bot from default branch — PR head may lack infra fixes.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
 
       - uses: actions/setup-python@v5
         with:
