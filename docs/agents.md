@@ -28,6 +28,15 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 3. For issue bot: create label **`agent`** and open issues you want automated (keep scope small).
 4. Optional: branch protection requiring **PR Check** before merge.
 
+## Workflow approval (Copilot / bot PRs)
+
+GitHub blocks workflows that use **repository secrets** on `pull_request` from untrusted authors until a maintainer approves. This repo avoids that for PR steward by:
+
+1. **`workflow_run`** — PR steward runs after PR Check on the default-branch workflow (secrets allowed).
+2. **[`approve-pending-actions.yml`](../.github/workflows/approve-pending-actions.yml)** — auto-approves other runs stuck on `action_required` when GitHub allows the API.
+
+Fork PRs: in **Settings → Actions → General**, you can set fork workflows to not require approval; the auto-approve workflow covers many cases after merge to `main`.
+
 ## Adding a new agent
 
 1. Add `scripts/<name>/` with README and entrypoint.
@@ -39,7 +48,8 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 | Workflow | Runs when a PR opens? |
 |----------|------------------------|
 | **PR Check** | Yes — every `pull_request` |
-| **PR steward** | Yes — `pull_request` opened / updated |
+| **PR steward** | Yes — after **PR Check** completes (`workflow_run`; no approval gate) |
+| **Auto-approve** | Yes — unblocks other workflows awaiting maintainer on PR open/update |
 | test-bot, docs-bot, CVE scan, issue-bot | No — cron or manual only |
 
 Bots do not chain automatically (test-bot does not wake docs-bot). Use schedules or run workflows manually.

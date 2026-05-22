@@ -17,29 +17,65 @@ def _gh(args: list[str]) -> str:
 
 
 def _summarize_checks(repo: str, pr_number: int) -> str:
-    try:
-        raw = _gh(
-            [
-                "pr",
-                "checks",
-                str(pr_number),
-                "--repo",
-                repo,
-                "--json",
-                "name,state,conclusion",
-            ]
-        )
-        checks = json.loads(raw)
-    except subprocess.CalledProcessError:
+    result = subprocess.run(
+        [
+            "gh",
+            "pr",
+            "checks",
+            str(pr_number),
+            "--repo",
+            repo,
+            "--json",
+            "name,state,bucket",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        combined = f"{result.stderr or ''}{result.stdout or ''}".lower()
+        if "no checks" in combined:
+            return "No checks reported yet."
         return "_Could not load checks._"
+
+    checks = json.loads(result.stdout)
 
     if not checks:
         return "No checks reported yet."
 
     lines = []
     for check in checks:
-        state = check.get("conclusion") or check.get("state") or "?"
+        state = check.get("state") or check.get("bucket") or "?"
         lines.append(f"- **{check.get('name', '?')}**: {state}")
+    return "\n".join(lines)
+
+
+def _diff_summary(repo: str, pr_number: int) -> str:
+    try:
+        raw = _gh(
+            [
+                "pr",
+                "view",
+                str(pr_number),
+                "--repo",
+                repo,
+                "--json",
+                "additions,deletions,changedFiles,files",
+            ]
+        )
+        data = json.loads(raw)
+    except subprocess.CalledProcessError:
+        return "(could not load diff summary)"
+
+    lines = [
+        f"{data.get('changedFiles', 0)} files changed, "
+        f"+{data.get('additions', 0)}, -{data.get('deletions', 0)}",
+    ]
+    for entry in data.get("files") or []:
+        path = entry.get("path", "?")
+        adds = entry.get("additions", 0)
+        dels = entry.get("deletions", 0)
+        lines.append(f" {path} | +{adds} -{dels}")
     return "\n".join(lines)
 
 
@@ -77,9 +113,7 @@ def _build_comment(
 ) -> str:
     number = pr["number"]
     checks = _summarize_checks(repo, number)
-    diff_stat = _gh(
-        ["pr", "diff", str(number), "--repo", repo, "--stat"]
-    ).strip()[:4000]
+    diff_stat = _diff_summary(repo, number)[:4000]
 
     ai = _ai_summary(pr.get("title", ""), pr.get("body") or "", diff_stat)
 
@@ -132,7 +166,7 @@ def _already_commented(repo: str, pr_number: int) -> bool:
 
 
 def _prs_from_event() -> list[dict] | None:
-    """When started by pull_request, return only the triggering PR."""
+    """When started by pull_request (local/tests), return only the triggering PR."""
     if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
         return None
     event_path = os.environ.get("GITHUB_EVENT_PATH", "")
