@@ -8,6 +8,8 @@ Optional OpenAI pass polishes the table when `OPENAI_API_KEY` is set.
 
 [`.github/workflows/docs-bot.yml`](../../.github/workflows/docs-bot.yml) — Mondays 08:00 UTC.
 
+Uses shared **`BOT_GH_TOKEN`** for push/PR so **PR Check** runs (see [docs/agents.md](../../docs/agents.md#bot-pat-one-secret-for-all-pr-bots)).
+
 ## Local
 
 ```bash

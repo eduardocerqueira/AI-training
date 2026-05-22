@@ -16,7 +16,7 @@ Skips a run if another open issue has `experiment-agent` + `agent-in-progress`.
 ## Secrets
 
 - **`OPENAI_API_KEY`** (required)
-- **`GITHUB_TOKEN`** — default; needs permission to create issues and PRs
+- **`BOT_GH_TOKEN`** (recommended) — shared PAT for push/PR so **PR Check** runs; see [docs/agents.md](../../docs/agents.md#bot-pat-one-secret-for-all-pr-bots)
 
 ## Local
 

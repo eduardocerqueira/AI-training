@@ -29,6 +29,9 @@ jobs:
       (github.event_name == 'issues' && github.event.label.name == 'agent')
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # PAT (not default GITHUB_TOKEN) so push/PR trigger PR Check and other workflows.
+    env:
+      BOT_GH_TOKEN: ${{ secrets.BOT_GH_TOKEN || secrets.ISSUE_BOT_GH_TOKEN || secrets.TEST_BOT_GH_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,7 +48,7 @@ jobs:
         id: issue-bot
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ env.BOT_GH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           ISSUE_BOT_BASE_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
@@ -62,7 +65,7 @@ jobs:
       - name: Create pull request
         if: ${{ steps.issue-bot.outputs.branch != '' }}
         env:
-          GH_TOKEN: ${{ secrets.ISSUE_BOT_GH_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ env.BOT_GH_TOKEN }}
           PR_BODY: ${{ steps.issue-bot.outputs.pr_body }}
           PR_TITLE: ${{ steps.issue-bot.outputs.pr_title }}
         run: |
@@ -76,7 +79,7 @@ jobs:
             --base "${{ github.event.repository.default_branch }}"; then
             echo "Opened pull request for branch ${{ steps.issue-bot.outputs.branch }}"
           else
-            echo "::error::Could not create pull request. Enable Actions PR creation or set ISSUE_BOT_GH_TOKEN."
+            echo "::error::Could not create pull request. Enable Actions PR creation or set BOT_GH_TOKEN (or ISSUE_BOT_GH_TOKEN)."
             echo "Branch was pushed: ${{ steps.issue-bot.outputs.branch }}"
             exit 1
           fi
