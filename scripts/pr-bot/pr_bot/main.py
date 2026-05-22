@@ -131,20 +131,27 @@ def _already_commented(repo: str, pr_number: int) -> bool:
     return BOT_MARKER in bodies
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--max-prs", type=int, default=5)
-    args = parser.parse_args()
+def _prs_from_event() -> list[dict] | None:
+    """When started by pull_request, return only the triggering PR."""
+    if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
+        return None
+    event_path = os.environ.get("GITHUB_EVENT_PATH", "")
+    if not event_path:
+        return None
+    event = json.loads(Path(event_path).read_text(encoding="utf-8"))
+    pr = event.get("pull_request")
+    if not pr:
+        return None
+    return [
+        {
+            "number": pr["number"],
+            "title": pr.get("title", ""),
+            "body": pr.get("body") or "",
+        }
+    ]
 
-    repo = os.environ.get("GITHUB_REPOSITORY", "")
-    if not repo and not args.dry_run:
-        raise SystemExit("GITHUB_REPOSITORY required")
 
-    if args.dry_run:
-        print("[dry-run] would review open PRs")
-        return
-
+def _list_open_prs(repo: str, limit: int) -> list[dict]:
     raw = _gh(
         [
             "pr",
@@ -156,10 +163,49 @@ def main() -> None:
             "--json",
             "number,title,body",
             "--limit",
-            str(args.max_prs),
+            str(limit),
         ]
     )
-    prs = json.loads(raw)
+    return json.loads(raw)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--max-prs", type=int, default=5)
+    parser.add_argument(
+        "--pr",
+        type=int,
+        default=None,
+        help="Review a single PR number (overrides list; set from GITHUB_EVENT)",
+    )
+    args = parser.parse_args()
+
+    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    if not repo and not args.dry_run:
+        raise SystemExit("GITHUB_REPOSITORY required")
+
+    if args.dry_run:
+        print("[dry-run] would review open PRs")
+        return
+
+    if args.pr is not None:
+        raw = _gh(
+            [
+                "pr",
+                "view",
+                str(args.pr),
+                "--repo",
+                repo,
+                "--json",
+                "number,title,body",
+            ]
+        )
+        prs = [json.loads(raw)]
+    else:
+        prs = _prs_from_event()
+        if prs is None:
+            prs = _list_open_prs(repo, args.max_prs)
 
     for pr in prs:
         n = pr["number"]

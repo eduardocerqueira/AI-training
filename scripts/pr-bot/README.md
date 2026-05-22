@@ -4,10 +4,10 @@ Reviews **open pull requests** and posts a summary comment. Does **not** merge (
 
 ## v1 behavior
 
-- Lists open PRs (max 5 per run).
-- Waits for GitHub check conclusions.
-- Posts a checklist comment: checks status, size, suggested review focus.
-- Optional OpenAI summary when `OPENAI_API_KEY` is set.
+- **On every new/updated PR** (`opened`, `synchronize`, `reopened`, `ready_for_review`): comments on **that PR only**.
+- **On schedule / manual run**: reviews up to 5 open PRs.
+- Posts a checklist comment: checks status, diff stat, optional OpenAI summary.
+- Skips if a steward comment already exists (`<!-- pr-bot:steward -->`).
 
 ## Auto-merge
 

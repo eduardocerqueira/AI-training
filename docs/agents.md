@@ -9,7 +9,7 @@ Automation that runs **at least once per week** (staggered cron) or on demand. S
 | [Docs bot](../scripts/docs-bot/README.md) | [`docs-bot.yml`](../.github/workflows/docs-bot.yml) | Mon 08:00 | `OPENAI_API_KEY` | PR |
 | [CVE scan](../scripts/cve-scan/README.md) | [`cve-scan.yml`](../.github/workflows/cve-scan.yml) | Wed 08:00 | — | Issue (if HIGH/CRITICAL) |
 | [Issue worker](../scripts/issue-bot/README.md) | [`issue-bot.yml`](../.github/workflows/issue-bot.yml) | Fri 08:00 | `OPENAI_API_KEY` | PR (label `agent`) |
-| [PR steward](../scripts/pr-bot/README.md) | [`pr-bot.yml`](../.github/workflows/pr-bot.yml) | Sat 08:00 | `OPENAI_API_KEY` (optional) | Comment / labels |
+| [PR steward](../scripts/pr-bot/README.md) | [`pr-bot.yml`](../.github/workflows/pr-bot.yml) | Sat 08:00 + on PR events | `OPENAI_API_KEY` (optional) | Comment |
 | Test bot | [`test-bot.yml`](../.github/workflows/test-bot.yml) | Sun 07:00 | `OPENAI_API_KEY` | PR |
 
 Manual run: **Actions** → pick workflow → **Run workflow**.
@@ -33,6 +33,16 @@ Manual run: **Actions** → pick workflow → **Run workflow**.
 1. Add `scripts/<name>/` with README and entrypoint.
 2. Add `.github/workflows/<name>.yml` with `schedule` + `workflow_dispatch`.
 3. Document here and in root [TODO.md](../TODO.md).
+
+## What triggers on a new PR?
+
+| Workflow | Runs when a PR opens? |
+|----------|------------------------|
+| **PR Check** | Yes — every `pull_request` |
+| **PR steward** | Yes — `pull_request` opened / updated |
+| test-bot, docs-bot, CVE scan, issue-bot | No — cron or manual only |
+
+Bots do not chain automatically (test-bot does not wake docs-bot). Use schedules or run workflows manually.
 
 ## Limits (honest)
 
