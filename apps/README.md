@@ -29,4 +29,19 @@ Each subdirectory is a **language workspace**. Projects are sibling folders insi
 See [../docs/getting-started.md](../docs/getting-started.md) and [../CONTRIBUTING.md](../CONTRIBUTING.md).
 
 <!-- docs-bot:start -->
+## Current projects (auto-synced)
+
+| Project                     | Language  |
+|-----------------------------|-----------|
+| `go/hf-inference-hello`     | Go-based inference example |
+| `go/hf-sentiment-server`    | Go server for sentiment analysis |
+| `node/hf-inference-hello`   | Node.js inference example |
+| `node/hf-qa-rag-api`        | Node.js API for question answering with RAG |
+| `python/hf-agents-lab`      | Python lab for experimenting with agents |
+| `python/hf-pipeline-hello`  | Python example for pipeline usage |
+| `python/hf-qa-rag`          | Python implementation of RAG for question answering |
+| `python/hf-smolagent-intro` | Introductory project for small agents in Python |
+| `typescript/hf-qa-rag-ui`   | TypeScript UI for question answering with RAG |
+
+_Last synced: 2026-05-25_
 <!-- docs-bot:end -->
